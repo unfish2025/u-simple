@@ -1,0 +1,20 @@
+.u-var {
+	--u-primary-color: #5578fa;
+	--u-success-color: #23AC63;
+	--u-warning-color: #FF980F;
+	--u-danger-color: #F55252;
+	--u-info-color: #B3BCC6;
+	--u-text-color: #333;
+	--line-height: 1.2;
+	--font-size-base: 28rpx;
+}
+
+.u-border-box {
+	box-sizing: border-box;
+}
+
+.u-base {
+	font-size: var(--font-size-base);
+	line-height: var(--line-height);
+	color: var(--u-text-color);
+}
