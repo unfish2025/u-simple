@@ -6,6 +6,7 @@
 		<u-button @click="toPopup" :is-border-radius="false">弹窗组件</u-button>
 		<u-button @click="toSelectItem" :is-border-radius="false">选择项组件</u-button>
 		<u-button @click="toSelectGroup" :is-border-radius="false">选择组组件</u-button>
+		<u-button @click="toCarousel" :is-border-radius="false">轮播组件</u-button>
 	</view>
 </template>
 
@@ -52,6 +53,12 @@ export default Vue.extend({
 		toSelectGroup() {
 			uni.navigateTo({
 				url: '/pages/select-group/index'
+			})
+		},
+
+		toCarousel() {
+			uni.navigateTo({
+				url: '/pages/carousel/index'
 			})
 		}
 	}

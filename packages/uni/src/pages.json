@@ -41,6 +41,12 @@
 			"style": {
 				"navigationBarTitleText": "select-group"
 			}
+		},
+		{
+			"path": "pages/carousel/index",
+			"style": {
+				"navigationBarTitleText": "carousel"
+			}
 		}
 	],
 	"globalStyle": {
