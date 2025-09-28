@@ -1,12 +1,19 @@
-.u-var {
+@import url('./iconfont.css');
+
+page {
 	--u-primary-color: #5578fa;
-	--u-success-color: #23AC63;
-	--u-warning-color: #FF980F;
-	--u-danger-color: #F55252;
-	--u-info-color: #B3BCC6;
+	--u-success-color: #23ac63;
+	--u-warning-color: #ff980f;
+	--u-danger-color: #f55252;
+	--u-info-color: #b3bcc6;
 	--u-text-color: #333;
-	--line-height: 1.2;
-	--font-size-base: 28rpx;
+	--u-placeholder-color: #c0c4cc;
+	--u-line-height: 1.2;
+	--u-font-size-base: 28rpx;
+	--u-border-color: #eaeef1;
+	--u-active-color: #f6f6f6;
+	--u-disabled-color: #c8c9cc;
+	--u-disabled-bg-color: #f5f5f5;
 }
 
 .u-border-box {
@@ -14,7 +21,7 @@
 }
 
 .u-base {
-	font-size: var(--font-size-base);
-	line-height: var(--line-height);
+	font-size: var(--u-font-size-base);
+	line-height: var(--u-line-height);
 	color: var(--u-text-color);
 }

@@ -1,30 +1,20 @@
 <template>
-	<view
-		class="u-var u-base u-button u-border-box"
-		:style="style"
-		:class="className"
-		@click.stop.prevent="isDisabled ? null : $emit('click', $event)"
-	>
+	<view class="u-base u-button u-border-box" :style="style" :class="className" @click.stop.prevent="isDisabled ? null : $emit('click', $event)">
 		<slot></slot>
 	</view>
 </template>
 
-<script lang="ts">
-import type { UButtonType, ButtonStyle, UButtonSize } from './types'
+<script>
 import Vue from 'vue'
 import '@/styles/index.scss'
 import { typeEmun, sizeEnum, typeToColorEnum } from './config'
 import { Css } from '@/utils'
 const css = new Css()
-/**
- * button 组件
- * @fires click (e: MouseEvent)
- */
 export default Vue.extend({
 	props: {
 		/** 按钮类型, 默认为 primary */
 		type: {
-			type: String as () => UButtonType | string,
+			type: String,
 			default: typeEmun.primary
 		},
 
@@ -36,7 +26,7 @@ export default Vue.extend({
 
 		/** 按钮尺寸, 支持 mini/small/normal/large, 默认为 normal */
 		size: {
-			type: String as () => UButtonSize,
+			type: String,
 			default: sizeEnum.normal
 		},
 
@@ -48,7 +38,7 @@ export default Vue.extend({
 
 		/** 点击反馈类型, 支持 darken/lighten, 默认为 darken */
 		activeFeedbackType: {
-			type: String as () => 'darken' | 'lighten',
+			type: String,
 			default: 'darken' // darken / lighten
 		},
 
@@ -76,9 +66,9 @@ export default Vue.extend({
 	},
 
 	computed: {
-		className(): object {
+		className() {
 			return {
-				[`u-button-${this.size}`]: sizeEnum[this.size as UButtonSize],
+				[`u-button-${this.size}`]: sizeEnum[this.size],
 				'u-button-is-plain': this.isPlain,
 				'u-button-is-background-color': !this.isPlain,
 				'u-button-is-active-feedback': this.isActiveFeedback,
@@ -87,11 +77,12 @@ export default Vue.extend({
 			}
 		},
 
-		style(): ButtonStyle {
-			const style: ButtonStyle = {}
-			const type = typeEmun[this.type as UButtonType]
+		style() {
+			/** @type {import('./types').ButtonStyle} */
+			const style = {}
+			const type = typeEmun[this.type]
 			if (type) {
-				style['--u-button-type-color'] = typeToColorEnum[type as UButtonType]
+				style['--u-button-type-color'] = typeToColorEnum[type]
 			} else {
 				style['--u-button-type-color'] = this.type
 			}
@@ -112,6 +103,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 .u-button {
 	display: inline-flex;
+	justify-content: center;
 	border: 1px solid var(--u-button-type-color);
 	color: #fff;
 	cursor: pointer;

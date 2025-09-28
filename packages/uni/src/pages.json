@@ -11,6 +11,36 @@
 			"style": {
 				"navigationBarTitleText": "button"
 			}
+		},
+		{
+			"path": "pages/input/index",
+			"style": {
+				"navigationBarTitleText": "input"
+			}
+		},
+		{
+			"path": "pages/mask/index",
+			"style": {
+				"navigationBarTitleText": "mask"
+			}
+		},
+		{
+			"path": "pages/popup/index",
+			"style": {
+				"navigationBarTitleText": "popup"
+			}
+		},
+		{
+			"path": "pages/select-item/index",
+			"style": {
+				"navigationBarTitleText": "select-item"
+			}
+		},
+		{
+			"path": "pages/select-group/index",
+			"style": {
+				"navigationBarTitleText": "select-group"
+			}
 		}
 	],
 	"globalStyle": {

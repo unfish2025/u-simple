@@ -1,10 +1,15 @@
 <template>
 	<view>
-		<u-button @click="toButton">按钮组件</u-button>
+		<u-button @click="toButton" :is-border-radius="false">按钮组件</u-button>
+		<u-button @click="toInput" :is-border-radius="false">输入框组件</u-button>
+		<u-button @click="toMask" :is-border-radius="false">遮罩组件</u-button>
+		<u-button @click="toPopup" :is-border-radius="false">弹窗组件</u-button>
+		<u-button @click="toSelectItem" :is-border-radius="false">选择项组件</u-button>
+		<u-button @click="toSelectGroup" :is-border-radius="false">选择组组件</u-button>
 	</view>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
 import UButton from '@/components/u-button/index.vue'
 export default Vue.extend({
@@ -18,9 +23,44 @@ export default Vue.extend({
 			uni.navigateTo({
 				url: '/pages/button/index'
 			})
+		},
+
+		toInput() {
+			uni.navigateTo({
+				url: '/pages/input/index'
+			})
+		},
+
+		toMask() {
+			uni.navigateTo({
+				url: '/pages/mask/index'
+			})
+		},
+
+		toPopup() {
+			uni.navigateTo({
+				url: '/pages/popup/index'
+			})
+		},
+
+		toSelectItem() {
+			uni.navigateTo({
+				url: '/pages/select-item/index'
+			})
+		},
+
+		toSelectGroup() {
+			uni.navigateTo({
+				url: '/pages/select-group/index'
+			})
 		}
 	}
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.u-button {
+	width: 100%;
+	margin-bottom: 20rpx;
+}
+</style>
