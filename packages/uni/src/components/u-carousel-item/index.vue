@@ -3,20 +3,12 @@
 </template>
 
 <script>
+import { createUUID } from '@/utils'
 export default {
 	data() {
 		return {
-			uuid: Math.random().toString(36).substring(2, 8) + '_' + Date.now()
-		}
-	},
-
-	computed: {
-		style() {
-			const index = this.uCarousel.orderMap?.[this.uuid]
-			console.log('index', index)
-			return {
-				order: index !== void 0 ? index : 'auto'
-			}
+			uuid: createUUID(),
+			style: {}
 		}
 	},
 
@@ -27,11 +19,19 @@ export default {
 	},
 
 	created() {
-		this.uCarousel.add(this.uuid)
+		/** @type {import('../u-carousel/types').UCarouselProvide['bus']} */
+		const bus = this.uCarousel.bus
+		bus.emit('add', this.uuid, (offsetX) => {
+			this.style = {
+				transform: `translateX(${offsetX}%)`
+			}
+		})
 	},
 
 	beforeDestroy() {
-		this.uCarousel.remove(this.uuid)
+		/** @type {import('../u-carousel/types').UCarouselProvide['bus']} */
+		const bus = this.uCarousel.bus
+		bus.emit('remove', this.uuid)
 	}
 }
 </script>

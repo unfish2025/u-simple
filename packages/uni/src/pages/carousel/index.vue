@@ -1,11 +1,26 @@
 <template>
 	<view>
-		<u-carousel v-model="value">
-			<u-carousel-item class="item">Item 1</u-carousel-item>
-			<u-carousel-item class="item">Item 2</u-carousel-item>
-			<u-carousel-item class="item">Item 3</u-carousel-item>
-		</u-carousel>
-		<view> index: {{ value }} </view>
+		<view>
+			<view> index: {{ value }} </view>
+			<u-carousel v-model="value" isLoop>
+				<u-carousel-item class="item">Item 1</u-carousel-item>
+				<u-carousel-item class="item">Item 2</u-carousel-item>
+				<u-carousel-item class="item">Item 3</u-carousel-item>
+			</u-carousel>
+		</view>
+		<view>
+			<view> index: {{ value }} </view>
+			<u-carousel v-model="value" isLoop>
+				<template #default>
+					<u-carousel-item class="item">Item 1</u-carousel-item>
+					<u-carousel-item class="item">Item 2</u-carousel-item>
+					<u-carousel-item class="item">Item 3</u-carousel-item>
+				</template>
+				<template #other>
+					<view>other slot</view>
+				</template>
+			</u-carousel>
+		</view>
 	</view>
 </template>
 
@@ -17,30 +32,6 @@ export default {
 	data() {
 		return {
 			value: 0
-		}
-	},
-
-	methods: {
-		getColor() {
-			const colorList = [
-				'#111827',
-				'#0f172a',
-				'#1f2937',
-				'#1e293b',
-				'#0a2342',
-				'#2b3945',
-				'#22303c',
-				'#2f3e46',
-				'#264653',
-				'#133e4a',
-				'#183a37',
-				'#2b3a2e',
-				'#2f1b12',
-				'#3a1d1d',
-				'#3b1f2b',
-				'#2c2541'
-			]
-			return `background-color: ${colorList[Math.floor(Math.random() * colorList.length)]};`
 		}
 	}
 }
