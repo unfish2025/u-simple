@@ -7,12 +7,13 @@
 		<u-button @click="toSelectItem" :is-border-radius="false">选择项组件</u-button>
 		<u-button @click="toSelectGroup" :is-border-radius="false">选择组组件</u-button>
 		<u-button @click="toCarousel" :is-border-radius="false">轮播组件</u-button>
+		<u-button @click="toUpload" :is-border-radius="false">文件上传组件</u-button>
 	</view>
 </template>
 
 <script>
 import Vue from 'vue'
-import UButton from '@/components/u-button/index.vue'
+import UButton from '@/components/u-button'
 export default Vue.extend({
 	components: { UButton },
 	data() {
@@ -60,14 +61,20 @@ export default Vue.extend({
 			uni.navigateTo({
 				url: '/pages/carousel/index'
 			})
+		},
+
+		toUpload() {
+			uni.navigateTo({
+				url: '/pages/upload/index'
+			})
 		}
 	}
 })
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss">
 .u-button {
-	width: 100%;
+	width: 750rpx;
 	margin-bottom: 20rpx;
 }
 </style>

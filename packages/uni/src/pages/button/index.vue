@@ -51,7 +51,7 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .title,
 .u-button {
 	margin: 10rpx;

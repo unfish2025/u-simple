@@ -6,7 +6,7 @@
 
 .u-iconfont {
 	font-family: 'u-iconfont';
-	font-size: 28rpx;
+	font-size: inherit;
 	font-style: normal;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

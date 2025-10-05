@@ -9,10 +9,10 @@
 </template>
 
 <script>
-import '@/styles/index.scss'
 export default {
 	model: {
-		event: 'change',
+		/** 兼容 uniapp bug v-model 只能为 input 和 value */
+		event: 'input',
 		prop: 'value'
 	},
 	props: {
@@ -72,7 +72,7 @@ export default {
 					this.uSelectGroup.addSelected(this.value)
 				}
 			} else {
-				this.$emit('change', !this.value)
+				this.$emit('input', !this.value)
 			}
 		}
 	}

@@ -24,4 +24,6 @@ page {
 	font-size: var(--u-font-size-base);
 	line-height: var(--u-line-height);
 	color: var(--u-text-color);
+	tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent;
 }

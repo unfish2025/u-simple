@@ -3,10 +3,10 @@
 		<slot name="prefix"></slot>
 		<input
 			class="u-input-control"
-			:type="computedType"
+			:type="type"
 			:value="currentValue"
 			:text-content-type="textContentType"
-			:password="isPassword && !isShowPasswordStatus"
+			:password="computedPassword"
 			:placeholder="placeholder"
 			:placeholder-style="placeholderStyle"
 			:placeholder-class="placeholderClass"
@@ -58,7 +58,8 @@
 </template>
 
 <script>
-import '@/styles/index.scss'
+import { Css } from '@/utils'
+const css = new Css()
 export default {
 	model: {
 		event: 'input',
@@ -113,9 +114,10 @@ export default {
 			default: true
 		},
 
-		/** 输入框类型, 具体支持类型参考 uniapp */
+		/** 输入框类型, 默认为 text */
 		type: {
-			type: String
+			type: String,
+			default: 'text'
 		},
 
 		/** 文本区域的语义，根据类型自动填充, 具体支持参考 uniapp */
@@ -127,9 +129,10 @@ export default {
 		placeholderClass: {
 			type: String
 		},
-		/** 最大输入长度, 具体支持参考 uniapp */
+		/** 最大输入长度, 默认为 200, 兼容 uniapp bug, 未设置 default(为undefined) 无法使用默认值 */
 		maxLength: {
-			type: Number
+			type: Number,
+			default: 200
 		},
 
 		/** 光标与键盘的距离, 具体支持参考 uniapp */
@@ -257,23 +260,17 @@ export default {
 	},
 
 	computed: {
-		computedType() {
-			if (this.type === 'password' || this.isPassword) {
-				if (this.isShowPassword && this.isShowPasswordStatus) {
-					return 'text'
-				}
-				return 'password'
-			} else {
-				return this.type
-			}
+		computedPassword() {
+			return this.isPassword && !this.isShowPasswordStatus
 		},
 
 		className() {
-			return {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.classObjectToString({
 				'u-input-is-border': this.isBorder,
 				'u-input-is-focus': this.isFocus,
 				'u-is-disabled': this.isDisabled
-			}
+			})
 		}
 	},
 

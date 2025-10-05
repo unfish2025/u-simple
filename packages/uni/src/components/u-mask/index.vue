@@ -1,5 +1,5 @@
 <template>
-	<view class="u-base u-mask u-border-box" :class="className" :style="style" @click="onClick" @animationend="onAnimationend" v-if="visible">
+	<view class="u-base u-mask u-border-box" :class="renderClassName" :style="style" @click="onClick" @animationend="onAnimationend" v-if="visible">
 		<view class="u-mask-container" @touchmove.stop.prevent v-if="isLockScroll"></view>
 		<view class="u-mask-container" v-else></view>
 		<slot></slot>
@@ -7,7 +7,8 @@
 </template>
 
 <script>
-import '@/styles/index.scss'
+import { Css } from '@/utils'
+const css = new Css()
 export default {
 	model: {
 		event: 'update:visible',
@@ -88,13 +89,19 @@ export default {
 
 	computed: {
 		style() {
-			return {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.styleObjectToString({
 				'--u-mask-bg-color': this.bgColor,
 				'--u-mask-z-index': this.zIndex,
 				'--u-mask-duration': `${this.duration}ms`,
 				'--u-mask-timing-function': this.timingFunction,
 				'--u-mask-delay': `${this.delay}ms`
-			}
+			})
+		},
+
+		renderClassName() {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.classObjectToString(this.className)
 		}
 	},
 
@@ -192,7 +199,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @keyframes u-mask-fade-enter {
 	from {
 		opacity: 0;

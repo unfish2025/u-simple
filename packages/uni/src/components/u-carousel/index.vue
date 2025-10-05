@@ -14,11 +14,12 @@
 </template>
 
 <script>
-import { createUUID } from '@/utils'
+import { createUUID, Css } from '@/utils'
 import Bus from '@yishu/event'
+const css = new Css()
 export default {
 	model: {
-		event: 'change',
+		event: 'input',
 		prop: 'value'
 	},
 
@@ -107,7 +108,8 @@ export default {
 				}
 			}
 
-			return style
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.styleObjectToString(style)
 		}
 	},
 
@@ -125,11 +127,11 @@ export default {
 		onTransitionEnd() {
 			// 向右滑动
 			if (this.tempValue > 0) {
-				this.$emit('change', this.list.length - 1)
+				this.$emit('input', this.list.length - 1)
 			}
 			// 向左滑动
 			else if (this.tempValue < 0) {
-				this.$emit('change', 0)
+				this.$emit('input', 0)
 			}
 			this.$nextTick(() => {
 				this.stopTransition = true
@@ -138,10 +140,20 @@ export default {
 					item.onChangeHandler(0)
 				})
 
+				// #ifdef WEB
 				setTimeout(() => {
 					this.stopTransition = false
 					this.isTransitioning = false
 				}, 0)
+				// #endif
+				// #ifdef MP-WEIXIN
+				setTimeout(() => {
+					this.$nextTick(() => {
+						this.stopTransition = false
+						this.isTransitioning = false
+					})
+				}, 10) // 小程序模拟器没问题, 但真机会有问题, 所以延时处理
+				// #endif
 			})
 		},
 
@@ -178,7 +190,7 @@ export default {
 				// 向右滑动
 				if (this.offsetX > 0) {
 					if (this.value > 0) {
-						this.$emit('change', this.value - 1)
+						this.$emit('input', this.value - 1)
 					} else if (this.isLoop && this.list.length >= this.minLoopItems && this.value === 0) {
 						this.tempValue = 1
 					}
@@ -186,7 +198,7 @@ export default {
 				// 向左滑动
 				else {
 					if (this.value < this.list.length - 1) {
-						this.$emit('change', this.value + 1)
+						this.$emit('input', this.value + 1)
 					} else if (this.isLoop && this.list.length >= this.minLoopItems && this.value === this.list.length - 1) {
 						this.tempValue = -this.list.length
 					}

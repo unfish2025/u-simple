@@ -9,7 +9,7 @@
 		</view>
 		<view>
 			<view class="title">多选</view>
-			<view class="result">结果: {{ list2Result }}</view>
+			<view class="result">结果: {{ list2Result.join(', ') }}</view>
 			<u-select-group is-multiple v-model="list2Result">
 				<u-select-item v-for="item in list2" :key="item.id" :value="item.id">{{ item.name }}</u-select-item>
 			</u-select-group>

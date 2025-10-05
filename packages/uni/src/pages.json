@@ -47,6 +47,12 @@
 			"style": {
 				"navigationBarTitleText": "carousel"
 			}
+		},
+		{
+			"path": "pages/upload/index",
+			"style": {
+				"navigationBarTitleText": "upload"
+			}
 		}
 	],
 	"globalStyle": {

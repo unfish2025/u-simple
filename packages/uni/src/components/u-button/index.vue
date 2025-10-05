@@ -5,12 +5,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import '@/styles/index.scss'
 import { typeEmun, sizeEnum, typeToColorEnum } from './config'
 import { Css } from '@/utils'
 const css = new Css()
-export default Vue.extend({
+export default {
 	props: {
 		/** 按钮类型, 默认为 primary */
 		type: {
@@ -67,14 +65,15 @@ export default Vue.extend({
 
 	computed: {
 		className() {
-			return {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.classObjectToString({
 				[`u-button-${this.size}`]: sizeEnum[this.size],
 				'u-button-is-plain': this.isPlain,
 				'u-button-is-background-color': !this.isPlain,
 				'u-button-is-active-feedback': this.isActiveFeedback,
 				'u-button-is-border-radius': this.isBorderRadius,
 				'u-button-is-disabled': this.isDisabled
-			}
+			})
 		},
 
 		style() {
@@ -94,10 +93,11 @@ export default Vue.extend({
 						: css.colorLighten(style['--u-button-type-color'], this.activeFeedbackDegree)
 			}
 
-			return style
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.styleObjectToString(style)
 		}
 	}
-})
+}
 </script>
 
 <style scoped lang="scss">

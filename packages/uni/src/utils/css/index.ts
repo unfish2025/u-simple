@@ -319,4 +319,28 @@ export class Css {
 		const b = hue2rgb(p, q, h - 1 / 3)
 		return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) }
 	}
+
+	/**
+	 * class 对象转换为字符串
+	 * @param classObj class 对象, 例如 { 'class-a': true, 'class-b': false }
+	 */
+	classObjectToString(classObj: { [key: string]: boolean }): string {
+		return Object.entries(classObj).reduce((str, [k, v]) => {
+			if (v) {
+				return str ? `${str} ${k}` : k
+			} else {
+				return str
+			}
+		}, '')
+	}
+
+	/**
+	 * style 对象转换为字符串
+	 * @param styleObj style 对象, 例如 { color: 'red', 'font-size': '16px' }
+	 */
+	styleObjectToString(styleObj: { [key: string]: string | number }): string {
+		return Object.entries(styleObj).reduce((str, [k, v]) => {
+			return (str += `${k}: ${v}; `)
+		}, '')
+	}
 }

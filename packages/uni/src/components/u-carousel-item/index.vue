@@ -1,14 +1,21 @@
 <template>
-	<view class="u-base u-carousel-item u-border-box" :style="style"><slot></slot></view>
+	<view class="u-base u-carousel-item u-border-box" :style="renderStyle"><slot></slot></view>
 </template>
 
 <script>
-import { createUUID } from '@/utils'
+import { createUUID, Css } from '@/utils'
+const css = new Css()
 export default {
 	data() {
 		return {
 			uuid: createUUID(),
 			style: {}
+		}
+	},
+
+	computed: {
+		renderStyle() {
+			return css.styleObjectToString(this.style)
 		}
 	},
 

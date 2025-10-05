@@ -5,10 +5,10 @@
 </template>
 
 <script>
-import '@/styles/index.scss'
 export default {
+	/** 兼容 uniapp bug v-model 只能为 input 和 value */
 	model: {
-		event: 'change',
+		event: 'input',
 		prop: 'value'
 	},
 
@@ -40,14 +40,14 @@ export default {
 							this.uSelectGroup.selectedList = []
 						}
 						this.uSelectGroup.selectedList.push(value)
-						this.$emit('change', this.isMultiple ? this.uSelectGroup.selectedList : this.uSelectGroup.selectedList[0] || null)
+						this.$emit('input', this.isMultiple ? this.uSelectGroup.selectedList : this.uSelectGroup.selectedList[0] || null)
 					}
 				},
 				removeSelected: (value) => {
 					const index = this.uSelectGroup.selectedList.indexOf(value)
 					if (index !== -1) {
 						this.uSelectGroup.selectedList.splice(index, 1)
-						this.$emit('change', this.isMultiple ? this.uSelectGroup.selectedList : this.uSelectGroup.selectedList[0] || null)
+						this.$emit('input', this.isMultiple ? this.uSelectGroup.selectedList : this.uSelectGroup.selectedList[0] || null)
 					}
 				}
 			}

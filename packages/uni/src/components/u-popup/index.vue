@@ -1,11 +1,25 @@
 <template>
-	<u-mask class="u-popup" v-bind="maskOptions" :visible="isShow" :isClickClose="false" @click="onClick">
-		<view class="u-popup-content" :style="style" :class="className" @animationend="onAnimationend"><slot></slot></view>
+	<u-mask
+		class="u-popup"
+		:visible="isShow"
+		:isClickClose="maskIsClickClose"
+		:zIndex="maskZIndex"
+		:bgColor="maskBgColor"
+		:isAnimation="maskIsAnimation"
+		:duration="maskDuration"
+		:timingFunction="maskTimingFunction"
+		:delay="maskDelay"
+		:isLockScroll="maskIsLockScroll"
+		:isLockBody="maskIsLockBody"
+		@click="onClick"
+	>
+		<view class="u-popup-content" :style="style" :class="renderClassName" @animationend="onAnimationend"><slot></slot></view>
 	</u-mask>
 </template>
 
 <script>
-import '@/styles/index.scss'
+import { Css } from '@/utils'
+const css = new Css()
 import UMask from '../u-mask/index.vue'
 export default {
 	components: { UMask },
@@ -19,14 +33,6 @@ export default {
 		visible: {
 			type: Boolean,
 			default: false
-		},
-
-		/** 遮罩层配置 */
-		maskOptions: {
-			type: Object,
-			default() {
-				return {}
-			}
 		},
 
 		/** 点击是否关闭 */
@@ -69,6 +75,56 @@ export default {
 		delay: {
 			type: [String, Number],
 			default: 0
+		},
+
+		// 以下兼容小程序, 无法使用 v-bind
+
+		/** mask 层级 */
+		maskZIndex: {
+			type: [String, Number],
+			default: 1000
+		},
+
+		/** mask 背景颜色 */
+		maskBgColor: {
+			type: String,
+			default: 'rgba(0, 0, 0, 0.45)'
+		},
+
+		/** mask 是否开启动画 */
+		maskIsAnimation: {
+			type: Boolean,
+			default: true
+		},
+
+		/** mask 动画时长，单位ms */
+		maskDuration: {
+			type: [String, Number],
+			default: 200
+		},
+
+		/** mask 动画函数 */
+		maskTimingFunction: {
+			type: String,
+			default: 'ease'
+		},
+
+		/** mask 动画延迟，单位ms */
+		maskDelay: {
+			type: [String, Number],
+			default: 0
+		},
+
+		/** mask 是否锁定背景滚动 */
+		maskIsLockScroll: {
+			type: Boolean,
+			default: true
+		},
+
+		/** mask 是否锁定页面滚动，仅在 web 有效，锁定后会修改 body 的 overflow 属性 */
+		maskIsLockBody: {
+			type: Boolean,
+			default: true
 		}
 	},
 
@@ -82,12 +138,18 @@ export default {
 
 	computed: {
 		style() {
-			return {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.styleObjectToString({
 				'--u-popup-z-index': this.zIndex,
 				'--u-popup-duration': `${this.duration}ms`,
 				'--u-popup-timing-function': this.timingFunction,
 				'--u-mask-delay': `${this.delay}ms`
-			}
+			})
+		},
+
+		renderClassName() {
+			// 兼容 uniapp bug 解析为字符串, 以适配小程序
+			return css.classObjectToString(this.className)
 		}
 	},
 
@@ -179,13 +241,13 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .u-popup-content {
 	width: 100%;
 	height: 100%;
 }
 
-// 上边
+/* // 上边 */
 @keyframes u-popup-animation-top-enter {
 	0% {
 		opacity: 0;
@@ -216,7 +278,7 @@ export default {
 	animation: u-popup-animation-top-leave var(--u-popup-duration) var(--u-popup-timing-function) var(--u-mask-delay) forwards;
 }
 
-// 下边
+/* // 下边 */
 @keyframes u-popup-animation-bottom-enter {
 	0% {
 		opacity: 0;
@@ -247,7 +309,7 @@ export default {
 	animation: u-popup-animation-bottom-leave var(--u-popup-duration) var(--u-popup-timing-function) var(--u-mask-delay) forwards;
 }
 
-// 左边
+/* // 左边 */
 @keyframes u-popup-animation-left-enter {
 	0% {
 		opacity: 0;
@@ -278,7 +340,7 @@ export default {
 	animation: u-popup-animation-left-leave var(--u-popup-duration) var(--u-popup-timing-function) var(--u-mask-delay) forwards;
 }
 
-// 右边
+/* // 右边 */
 @keyframes u-popup-animation-right-enter {
 	0% {
 		opacity: 0;
@@ -309,7 +371,7 @@ export default {
 	animation: u-popup-animation-right-leave var(--u-popup-duration) var(--u-popup-timing-function) var(--u-mask-delay) forwards;
 }
 
-// 中间
+/* // 中间 */
 @keyframes u-popup-animation-center-enter {
 	0% {
 		opacity: 0;

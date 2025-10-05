@@ -1,10 +1,11 @@
 <script lang="ts">
-	import Vue from 'vue'
-	export default Vue.extend({
-		mpType: 'app'
-	})
+import Vue from 'vue'
+export default Vue.extend({
+	mpType: 'app'
+})
 </script>
 
 <style>
-	/*每个页面公共css */
+/*每个页面公共css */
+@import url('./styles/index.css');
 </style>

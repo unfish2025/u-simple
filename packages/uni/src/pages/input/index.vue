@@ -2,7 +2,7 @@
 	<view>
 		<view>
 			<view class="title">输入类型</view>
-			<u-input v-model="textValue" type="password" placeholder="密码类型" />
+			<u-input v-model="textValue" isPassword placeholder="密码类型" />
 			<u-input v-model="textValue" placeholder="文本类型" />
 			<view>{{ textValue }}</view>
 		</view>
@@ -28,7 +28,7 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .title,
 .u-input {
 	margin: 10rpx;
