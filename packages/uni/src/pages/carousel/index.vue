@@ -78,6 +78,9 @@ export default {
 
 // 编译成小程序, 小程序自身问题, 所以需要样式穿透, web 端是不需要的
 .item:nth-child(1) {
+	// #ifdef WEB
+	background-color: red;
+	// #endif
 	::v-deep {
 		.u-carousel-item {
 			background-color: red;
@@ -86,6 +89,9 @@ export default {
 }
 
 .item:nth-child(2) {
+	// #ifdef WEB
+	background-color: green;
+	// #endif
 	::v-deep {
 		.u-carousel-item {
 			background-color: green;
@@ -94,6 +100,9 @@ export default {
 }
 
 .item:nth-child(3) {
+	// #ifdef WEB
+	background-color: blue;
+	// #endif
 	::v-deep {
 		.u-carousel-item {
 			background-color: blue;

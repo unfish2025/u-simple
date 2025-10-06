@@ -2,9 +2,10 @@
 	<view
 		class="u-base u-carousel u-border-box"
 		:class="{ [uuid]: true }"
-		@touchstart.stop.prevent="onTouchStart"
-		@touchmove.stop.prevent="onTouchMove"
-		@touchend.stop.prevent="onTouchEnd"
+		@mousedown="onTouchStart"
+		@touchstart="onTouchStart"
+		@touchmove="onTouchMove"
+		@touchend="onTouchEnd"
 	>
 		<view class="u-carousel-container" :style="style" @transitionstart="onTransitionStart" @transitionend="onTransitionEnd">
 			<slot></slot>
@@ -14,6 +15,11 @@
 </template>
 
 <script>
+/**
+ * uniapp bug: 通过 e 调用 preventDefault/stopPropagation 无效
+ * 无法知晓外部是否需要阻止默认行为和事件冒泡, 所以组件内不作处理
+ * 由外部自行处理
+ */
 import { createUUID, Css } from '@/utils'
 import Bus from '@yishu/event'
 const css = new Css()
@@ -87,7 +93,12 @@ export default {
 				})
 			},
 			startX: 0,
-			offsetX: 0
+			offsetX: 0,
+			// 鼠标拖拽状态，仅 Web 下使用
+			isDragging: false,
+			// 文档级事件处理器引用（仅 WEB 使用）
+			docMouseMove: null,
+			docMouseUp: null
 		}
 	},
 
@@ -120,6 +131,20 @@ export default {
 	},
 
 	methods: {
+		// 兼容 touch 与 mouse 的横坐标获取
+		getClientX(e) {
+			if (!e) return null
+			// TouchEvent
+			if (e.changedTouches && e.changedTouches[0]) {
+				return e.changedTouches[0].clientX
+			}
+			// MouseEvent
+			if (typeof e.clientX === 'number') {
+				return e.clientX
+			}
+			return null
+		},
+
 		onTransitionStart() {
 			this.isTransitioning = true
 		},
@@ -158,11 +183,35 @@ export default {
 		},
 
 		onTouchStart(e) {
-			this.startX = e.changedTouches[0].clientX
+			const x = this.getClientX(e)
+			if (x == null) return
+			this.startX = x
+			this.offsetX = 0
+			if (e && e.type === 'mousedown') {
+				this.isDragging = true
+				// #ifdef WEB
+				// 悬挂文档级 mousemove/mouseup，保证拖拽不因指针移出组件而丢失
+				if (!this.docMouseMove) {
+					this.docMouseMove = (ev) => this.onTouchMove(ev)
+				}
+				if (!this.docMouseUp) {
+					this.docMouseUp = (ev) => this.onTouchEnd(ev)
+				}
+				document.addEventListener('mousemove', this.docMouseMove)
+				document.addEventListener('mouseup', this.docMouseUp)
+				// #endif
+			} else {
+				// touchstart
+				this.isDragging = true
+			}
 		},
 
 		onTouchMove(e) {
 			if (this.isTransitioning || this.isDisabled) return
+			// 鼠标移动仅在拖拽中才处理
+			if (e && e.type === 'mousemove') {
+				if (!this.isDragging) return
+			}
 			// 移动过程中计算, 避免切换闪烁
 			if (this.isLoop && this.list.length >= this.minLoopItems) {
 				if (this.value === 0) {
@@ -177,7 +226,9 @@ export default {
 					})
 				}
 			}
-			const offsetX = e.changedTouches[0].clientX - this.startX
+			const x = this.getClientX(e)
+			if (x == null) return
+			const offsetX = x - this.startX
 			if (this.width && Math.abs(this.offsetX) >= this.width) {
 				this.offsetX = this.offsetX > 0 ? this.width : -this.width
 			} else {
@@ -185,7 +236,9 @@ export default {
 			}
 		},
 
-		onTouchEnd() {
+		onTouchEnd(e) {
+			// 对于鼠标，仅在处于拖拽状态时才处理
+			if (e && e.type === 'mouseup' && !this.isDragging) return
 			if (Math.abs(this.offsetX) > this.threshold) {
 				// 向右滑动
 				if (this.offsetX > 0) {
@@ -205,6 +258,17 @@ export default {
 				}
 			}
 			this.offsetX = 0
+			this.isDragging = false
+			this.startX = 0
+			// #ifdef WEB
+			// 移除文档级事件监听，防止泄漏
+			if (this.docMouseMove) {
+				document.removeEventListener('mousemove', this.docMouseMove)
+			}
+			if (this.docMouseUp) {
+				document.removeEventListener('mouseup', this.docMouseUp)
+			}
+			// #endif
 			if (!this.isTransition) {
 				this.onTransitionEnd()
 			}
@@ -230,6 +294,15 @@ export default {
 	beforeDestroy() {
 		// #ifdef WEB || MP-WEIXIN
 		uni.offWindowResize(this.windowResizeCallback)
+		// #endif
+		// #ifdef WEB
+		// 兜底移除文档级事件
+		if (this.docMouseMove) {
+			document.removeEventListener('mousemove', this.docMouseMove)
+		}
+		if (this.docMouseUp) {
+			document.removeEventListener('mouseup', this.docMouseUp)
+		}
 		// #endif
 	}
 }
