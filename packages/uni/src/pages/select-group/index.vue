@@ -17,13 +17,13 @@
 		<view>
 			<view class="title">组禁用</view>
 			<u-select-group is-disabled>
-				<u-select-item v-for="item in list1" :key="item.id" :value="item.id">{{ item.name }}</u-select-item>
+				<u-select-item v-for="item in list3" :key="item.id" :value="item.id">{{ item.name }}</u-select-item>
 			</u-select-group>
 		</view>
 		<view>
 			<view class="title">选项禁用</view>
 			<u-select-group>
-				<u-select-item v-for="item in list2" :key="item.id" :value="item.id" :isDisabled="item.isDisabled">{{ item.name }}</u-select-item>
+				<u-select-item v-for="item in list3" :key="item.id" :value="item.id" :isDisabled="item.isDisabled">{{ item.name }}</u-select-item>
 			</u-select-group>
 		</view>
 	</view>
@@ -45,6 +45,10 @@ export default Vue.extend({
 				{ id: 3, name: '选项3', value: false }
 			],
 			list2: [
+				{ id: 1, name: '选项1', value: false },
+				{ id: 2, name: '选项2', value: false }
+			],
+			list3: [
 				{ id: 1, name: '选项1', value: false },
 				{ id: 2, name: '禁用', value: false, isDisabled: true }
 			]
