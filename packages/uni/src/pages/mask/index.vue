@@ -17,7 +17,7 @@
 		<view>
 			<view class="title">内容滚动</view>
 			<u-button @click="maskVisible3 = true">打开遮罩 {{ maskVisible3 }}</u-button>
-			<u-mask :visible.sync="maskVisible3">
+			<u-mask :visible.sync="maskVisible3" :isLockBody="false">
 				<view class="container" @click.stop>
 					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi cupiditate dicta deleniti soluta aspernatur, optio eum quasi nobis,
 					laboriosam consequuntur enim numquam voluptate sint aperiam iste, blanditiis maxime dolores! Saepe, adipisci ullam pariatur vel
@@ -67,5 +67,6 @@ export default Vue.extend({
 	border-radius: 8rpx;
 	max-height: 200rpx;
 	overflow: auto;
+	overscroll-behavior: contain;
 }
 </style>

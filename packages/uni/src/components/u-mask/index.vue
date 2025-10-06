@@ -1,7 +1,8 @@
 <template>
 	<view class="u-base u-mask u-border-box" :class="renderClassName" :style="style" @click="onClick" @animationend="onAnimationend" v-if="visible">
-		<view class="u-mask-container" @touchmove.stop.prevent v-if="isLockScroll"></view>
+		<view class="u-mask-container" @mousewheel.stop.prevent @touchmove.stop.prevent v-if="isLockScroll"></view>
 		<view class="u-mask-container" v-else></view>
+		<!-- 外部需要阻止内容滚动后滚动穿透问题可给滚动容器添加 overscroll-behavior: contain; -->
 		<slot></slot>
 	</view>
 </template>
@@ -69,10 +70,10 @@ export default {
 			default: true
 		},
 
-		/** 是否锁定页面滚动，仅在 web 有效，锁定后会修改 body 的 overflow 属性 */
+		/** 是否锁定页面滚动，仅在 web 有效，锁定后会修改 body 的 overflow 属性, 默认为 false */
 		isLockBody: {
 			type: Boolean,
-			default: true
+			default: false
 		}
 	},
 
