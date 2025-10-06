@@ -2,7 +2,7 @@
 	<u-mask
 		class="u-popup"
 		:visible="isShow"
-		:isClickClose="maskIsClickClose"
+		:isClickClose="false"
 		:zIndex="maskZIndex"
 		:bgColor="maskBgColor"
 		:isAnimation="maskIsAnimation"

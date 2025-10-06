@@ -123,5 +123,6 @@ export default Vue.extend({
 	border-radius: 8rpx;
 	max-height: 200rpx;
 	overflow: auto;
+	overscroll-behavior: contain;
 }
 </style>
