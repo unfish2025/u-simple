@@ -367,8 +367,9 @@ export default {
 }
 
 .u-input-suffix {
+	height: 100%;
 	margin-left: 10rpx;
 	cursor: pointer;
-	font-size: 30rpx;
+	font-size: 34rpx;
 }
 </style>
