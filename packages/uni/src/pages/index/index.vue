@@ -8,6 +8,7 @@
 		<u-button @click="toSelectGroup" :is-border-radius="false">选择组组件</u-button>
 		<u-button @click="toCarousel" :is-border-radius="false">轮播组件</u-button>
 		<u-button @click="toUpload" :is-border-radius="false">文件上传组件</u-button>
+		<u-button @click="toUploadImage" :is-border-radius="false">图片上传组件</u-button>
 	</view>
 </template>
 
@@ -67,12 +68,18 @@ export default Vue.extend({
 			uni.navigateTo({
 				url: '/pages/upload/index'
 			})
+		},
+
+		toUploadImage() {
+			uni.navigateTo({
+				url: '/pages/upload-image/index'
+			})
 		}
 	}
 })
 </script>
 
-<style  lang="scss">
+<style lang="scss">
 .u-button {
 	width: 750rpx;
 	margin-bottom: 20rpx;

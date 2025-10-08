@@ -2,15 +2,23 @@
 	<view class="container">
 		<view>
 			<view class="title">单文件上传</view>
-			<UUpload v-model="fileList1"></UUpload>
+			<UUpload v-model="fileList1" @input="onChange"></UUpload>
 		</view>
 		<view>
 			<view class="title">多文件上传</view>
-			<UUpload v-model="fileList2" :limit="10" isWebMultiple></UUpload>
+			<UUpload v-model="fileList2" :count="3" @input="onChange"></UUpload>
 		</view>
 		<view>
 			<view class="title">禁止操作</view>
-			<UUpload v-model="fileList2" :limit="10" isWebMultiple isDisabled></UUpload>
+			<UUpload v-model="fileList2" isDisabled></UUpload>
+		</view>
+		<view>
+			<view class="title">使用原生 web 上传器多文件上传</view>
+			<UUpload v-model="fileList3" isUseWebChooseFile :count="2" :webChooseFileProps="{ count: 3 }" @input="onChange"></UUpload>
+		</view>
+		<view>
+			<view class="title">使用 count 文件上传</view>
+			<UUpload v-model="fileList4" :count="3" @input="onChange"></UUpload>
 		</view>
 	</view>
 </template>
@@ -22,7 +30,15 @@ export default {
 	data() {
 		return {
 			fileList1: [],
-			fileList2: []
+			fileList2: [],
+			fileList3: [],
+			fileList4: []
+		}
+	},
+
+	methods: {
+		onChange(e) {
+			console.log('onChange', e)
 		}
 	}
 }
