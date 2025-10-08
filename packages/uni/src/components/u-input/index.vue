@@ -45,13 +45,13 @@
 			<view
 				v-if="isClearable && currentValue.length"
 				class="u-input-suffix u-clearable u-iconfont icon-round_close_light"
-				@click="onClear"
+				@click.stop.prevent="onClear"
 			></view>
 			<view
 				v-if="(type === 'password' || isPassword) && isShowPassword"
 				class="u-input-suffix u-show-password u-iconfont"
 				:class="isShowPasswordStatus ? 'icon-attention_light' : 'icon-attentionforbid'"
-				@click="onSwitchShowPassword"
+				@click.stop.prevent="onSwitchShowPassword"
 			></view>
 		</slot>
 	</view>
@@ -368,7 +368,7 @@ export default {
 
 .u-input-suffix {
 	height: 100%;
-	margin-left: 10rpx;
+	padding: 0 10rpx;
 	cursor: pointer;
 	font-size: 34rpx;
 }
