@@ -2,7 +2,18 @@
 	<view ref="uUpload" class="u-base u-border-box u-upload-image">
 		<view class="u-upload-image-list-item u-border-box" v-for="(it, i) in value" :key="it.uuid" @click="priview(it, i)">
 			<slot name="item" :item="it" :index="i">
-				<image :src="it.url" class="u-upload-image-item-content-image" @error="$emit('error', $event)" @load="$emit('load', $event)"></image>
+				<image
+					:src="it.url"
+					class="u-upload-image-item-content-image"
+					:mode="imageMode"
+					:lazyLoad="imageLazyLoad"
+					:fadeShow="imageFadeShow"
+					:webp="imageWebp"
+					:showMenuByLongpress="imageShowMenuByLongpress"
+					:draggable="imageDraggable"
+					@error="$emit('error', $event)"
+					@load="$emit('load', $event)"
+				></image>
 			</slot>
 			<slot name="remove" :item="it" :index="i">
 				<view
