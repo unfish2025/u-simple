@@ -1,6 +1,6 @@
 <template>
 	<view ref="uUpload" class="u-base u-border-box u-upload">
-		<slot :chooseFile="chooseFile" :list="value">
+		<slot :chooseFile="chooseFile" :list="value" v-if="computedIsShow">
 			<view
 				class="u-upload-add-container u-border-box"
 				:class="{ 'u-upload-is-disabled': !allowOperate, 'u-upload-is-active': allowOperate }"
@@ -30,8 +30,11 @@
 </template>
 
 <script>
-import { createUUID, Path } from '@/utils'
+import { createUUID, Path, WebChooseFile } from '@/utils'
 const path = new Path()
+// #ifdef WEB
+const webChooseFile = new WebChooseFile()
+// #endif
 export default {
 	/** 兼容 uniapp bug v-model 只能为 input 和 value */
 	model: {
@@ -48,30 +51,46 @@ export default {
 			}
 		},
 
-		/** 上传文件数量限制, 默认为 1 */
-		limit: {
-			type: Number,
-			default: 1
+		/** 使用 web 原生 input 选择文件时的配置项(仅支持 web) */
+		webChooseFileProps: {
+			type: Object,
+			default() {
+				return {}
+			}
 		},
 
-		/** web 端文件是否支持多选, 默认为 false */
-		isWebMultiple: {
+		/** 使用 uni-app 选择文件时的配置项(仅支持 web) */
+		uniChooseFileProps: {
+			type: Object,
+			default() {
+				return {}
+			}
+		},
+
+		/** 使用微信选择文件时的配置项(仅支持微信) */
+		wxChooseFileProps: {
+			type: Object,
+			default() {
+				return {}
+			}
+		},
+
+		/** 是否使用 web 原生 input 选择文件, 默认为 false, 使用 uni-app 选择文件 */
+		isUseWebChooseFile: {
 			type: Boolean,
 			default: false
 		},
 
-		/** web 端文件类型限制, 默认为空字符串 */
-		webAccept: {
-			type: String,
-			default: ''
+		/** 上传文件数量限制, 该配置将成为 webChooseFileProps|uniChooseFileProps|wxChooseFileProps 的 count 默认配置, 默认为 1 */
+		count: {
+			type: Number,
+			default: 1
 		},
 
-		/** 微信小程序端文件类型限制, 默认为空数组 */
-		wxAllowExt: {
-			type: Array,
-			default() {
-				return []
-			}
+		/** 文件到达最大上限时是否显示上传控件, 默认为 true */
+		isMaxCountShowUpload: {
+			type: Boolean,
+			default: true
 		},
 
 		/** 是否在选择文件后立即获取文件的 ArrayBuffer 数据, 默认为 false */
@@ -109,31 +128,47 @@ export default {
 	},
 
 	data() {
-		return {
-			input: null
-		}
+		return {}
 	},
 
 	computed: {
+		/** 剩余可选择数 */
+		surplus() {
+			let surplus = 0
+			// #ifdef WEB
+			if (this.isUseWebChooseFile) {
+				surplus = (this.webChooseFileProps.count ?? this.count ?? 1) - this.value.length
+			} else {
+				surplus = (this.uniChooseFileProps.count ?? this.count ?? 1) - this.value.length
+			}
+			// #endif
+			// #ifdef MP-WEIXIN
+			surplus = (this.wxChooseFileProps.count ?? this.count ?? 1) - this.value.length
+			// #endif
+			return surplus
+		},
+
 		allowOperate() {
-			return !this.isDisabled && this.value.length < this.limit
+			return !this.isDisabled && this.surplus > 0
+		},
+
+		computedIsShow() {
+			if (this.value.length < this.surplus) {
+				return true
+			}
+			return this.isMaxCountShowUpload
 		}
 	},
 
 	methods: {
 		// #ifdef WEB
-		async onWebFileChange(e) {
-			const originFiles = e.target.files ? Array.from(e.target.files) : []
-			this.input.value = null
+		async onWebFileChange(fileList) {
 			let files = await Promise.all(
-				originFiles.slice(0, this.limit - this.value.length).map(async (file) => {
-					const { ext, filename } = path.getNameInfo(file.name)
+				fileList.map(async (fileInfo) => {
 					return {
+						...fileInfo,
 						uuid: createUUID(),
-						file,
-						ext,
-						filename,
-						arrayBuffer: this.immediateGetArrayBuffer ? await file.arrayBuffer() : null
+						arrayBuffer: this.immediateGetArrayBuffer ? await fileInfo.file.arrayBuffer() : null
 					}
 				})
 			)
@@ -171,13 +206,15 @@ export default {
 		async onWxFileChange(res) {
 			const originFiles = res.tempFiles
 			let files = await Promise.all(
-				originFiles.slice(0, this.limit - this.value.length).map(async (file) => {
-					const { ext, filename } = path.getNameInfo(file.name)
+				originFiles.slice(0, this.surplus).map(async (file) => {
+					const { ext, filename } = path.getNameInfo(file.name ?? file.path ?? '')
 					return {
 						uuid: createUUID(),
 						file,
 						ext,
 						filename,
+						size: file.size,
+						type: file.type ?? this.wxChooseFileProps.type ?? 'all',
 						arrayBuffer: this.immediateGetArrayBuffer ? await this.wxReadFileAsArrayBuffer(file.path) : null
 					}
 				})
@@ -201,17 +238,40 @@ export default {
 		},
 		// #endif
 
+		/** 选择文件 */
 		async chooseFile() {
 			if (!this.allowOperate) return
 			// #ifdef WEB
-			this.input.click()
+			if (this.isUseWebChooseFile) {
+				const files = await webChooseFile.chooseFile({
+					...this.webChooseFileProps,
+					count: this.surplus,
+					packFile: true
+				})
+				this.onWebFileChange(files)
+			} else {
+				uni.chooseFile({
+					...this.uniChooseFileProps,
+					count: this.surplus,
+					success: (res) => {
+						if (this.uniChooseFileProps.success) {
+							this.uniChooseFileProps.success(res)
+						}
+
+						this.onWebFileChange(res.tempFiles.slice(0, this.surplus).map((it) => webChooseFile.packFile(it)))
+					}
+				})
+			}
 			// #endif
 			// #ifdef MP-WEIXIN
-			const tempFiles = wx.chooseMessageFile({
-				count: this.limit - this.value.length,
+			wx.chooseMessageFile({
 				type: 'all',
-				extension: this.wxAllowExt.length ? this.wxAllowExt : void 0,
+				...this.wxChooseFileProps,
+				count: this.surplus,
 				success: (res) => {
+					if (this.wxChooseFileProps.success) {
+						this.wxChooseFileProps.success(res)
+					}
 					this.onWxFileChange(res)
 				}
 			})
@@ -231,31 +291,6 @@ export default {
 				this.value.filter((_, i) => i !== index)
 			)
 		}
-	},
-
-	mounted() {
-		// #ifdef WEB
-		const input = document.createElement('input')
-		input.type = 'file'
-		input.style.display = 'none'
-		this.input = input
-		input.accept = this.webAccept
-		input.multiple = this.isWebMultiple
-		input.addEventListener('change', this.onWebFileChange.bind(this))
-		this.$refs.uUpload.$el.appendChild(input)
-		// #endif
-	},
-
-	watch: {
-		// #ifdef WEB
-		isWebMultiple(value) {
-			this.input.multiple = value
-		},
-
-		webAccept(value) {
-			this.input.accept = value
-		}
-		// #endif
 	}
 }
 </script>
