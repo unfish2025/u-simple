@@ -53,6 +53,12 @@
 			"style": {
 				"navigationBarTitleText": "upload"
 			}
+		},
+		{
+			"path": "pages/upload-image/index",
+			"style": {
+				"navigationBarTitleText": "upload-image"
+			}
 		}
 	],
 	"globalStyle": {

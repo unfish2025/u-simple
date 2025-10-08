@@ -4,7 +4,9 @@
   "description": "文件管理系统",
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "pnpm -r dev"
+    "dev": "pnpm -r dev",
+    "dev:h5": "cd packages/uni && pnpm dev:h5",
+    "dev:wx": "cd packages/uni && pnpm dev:wx"
   },
   "author": "unfish <unfish2025@gmail.com>",
   "license": "MIT",
