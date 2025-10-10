@@ -9,7 +9,9 @@ export default {
 	data() {
 		return {
 			uuid: createUUID(),
-			style: {}
+			style: {
+				transform: `translateX(0%)`
+			}
 		}
 	},
 
@@ -45,7 +47,10 @@ export default {
 
 <style scoped lang="scss">
 .u-carousel-item {
+	--u-carousel-item-width: 100%;
+	--u-carousel-item-height: auto;
+	width: var(--u-carousel-item-width);
+	height: var(--u-carousel-item-height);
 	flex-shrink: 0;
-	width: 100%;
 }
 </style>

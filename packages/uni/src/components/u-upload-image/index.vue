@@ -5,14 +5,14 @@
 				<image
 					:src="it.url"
 					class="u-upload-image-item-content-image"
-					:mode="imageMode"
-					:lazyLoad="imageLazyLoad"
-					:fadeShow="imageFadeShow"
-					:webp="imageWebp"
-					:showMenuByLongpress="imageShowMenuByLongpress"
-					:draggable="imageDraggable"
-					@error="$emit('error', $event)"
-					@load="$emit('load', $event)"
+					:mode="imageConfig.mode"
+					:lazyLoad="imageConfig.lazyLoad"
+					:fadeShow="imageConfig.fadeShow"
+					:webp="imageConfig.webp"
+					:showMenuByLongpress="imageConfig.showMenuByLongpress"
+					:draggable="imageConfig.draggable"
+					@error="$emit('error', $event, it, i)"
+					@load="$emit('load', $event, it, i)"
 				></image>
 			</slot>
 			<slot name="remove" :item="it" :index="i">
@@ -20,7 +20,7 @@
 					v-if="!isDisabled || isDisabledShowRemoveIcon"
 					class="u-iconfont icon-close u-upload-image-remove-icon"
 					:class="{ 'u-upload-image-is-disabled': isDisabled, 'u-upload-image-is-active': !isDisabled }"
-					@click="removeFile(it, i)"
+					@click.stop.prevent="removeFile(it, i)"
 				></view>
 			</slot>
 		</view>
@@ -134,8 +134,8 @@ export default {
 			default: false
 		},
 
-		/** 选择文件钩子函数, 返回值将作为选择的结果 */
-		choose: {
+		/** 文件过滤钩子函数, 返回值将作为选择的结果 */
+		filter: {
 			type: Function
 		},
 
@@ -161,40 +161,12 @@ export default {
 			default: false
 		},
 
-		/** 图片裁剪、缩放的模式, 具体参考 uniapp image 组件 */
-		imageMode: {
-			type: String,
-			default: 'scaleToFill'
-		},
-
-		/** 图片懒加载。只针对 page 与 scroll-view 下的 image 有效, 具体参考 uniapp image 组件 */
-		imageLazyLoad: {
-			type: Boolean,
-			default: false
-		},
-
-		/** 图片显示动画效果, 具体参考 uniapp image 组件 */
-		imageFadeShow: {
-			type: Boolean,
-			default: true
-		},
-
-		/** 在系统不支持webp的情况下是否单独启用webp。默认false，只支持网络资源。webp支持详见下面说明, 具体参考 uniapp image 组件 */
-		imageWebp: {
-			type: Boolean,
-			default: false
-		},
-
-		/** 开启长按图片显示识别小程序码菜单, 具体参考 uniapp image 组件 */
-		imageShowMenuByLongpress: {
-			type: Boolean,
-			default: false
-		},
-
-		/** 是否能拖动图片, 具体参考 uniapp image 组件 */
-		imageDraggable: {
-			type: Boolean,
-			default: false
+		/** image 相关配置项 */
+		imageProps: {
+			type: Object,
+			default() {
+				return {}
+			}
 		}
 	},
 
@@ -207,6 +179,19 @@ export default {
 	},
 
 	computed: {
+		imageConfig() {
+			const config = {
+				mode: 'scaleToFill',
+				lazyLoad: false,
+				fadeShow: true,
+				webp: false,
+				showMenuByLongpress: false,
+				draggable: false,
+				...this.imageProps
+			}
+			return config
+		},
+
 		/** 剩余可选择数 */
 		surplus() {
 			let surplus = 0
@@ -241,6 +226,7 @@ export default {
 
 	methods: {
 		priview(it, i) {
+			this.$emit('priview', it, i)
 			if (!this.isPriview) {
 				return
 			}
@@ -258,16 +244,16 @@ export default {
 					return {
 						...fileInfo,
 						uuid: createUUID(),
-						url: fileInfo.file.path ? fileInfo.file.path : URL.createObjectURL(new Blob([fileInfo.file], { type: fileInfo.file.type })),
+						url: fileInfo.file.path ? fileInfo.file.path : URL.createObjectURL(fileInfo.file),
 						arrayBuffer: this.immediateGetArrayBuffer ? await fileInfo.file.arrayBuffer() : null
 					}
 				})
 			)
 			files.forEach((it) => this.tempUrlList.push(it.url))
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}
@@ -313,10 +299,10 @@ export default {
 					}
 				})
 			)
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}
@@ -510,6 +496,7 @@ export default {
 	position: absolute;
 	top: 0;
 	right: 0;
+	z-index: 1;
 	display: flex;
 	justify-content: center;
 	align-items: center;

@@ -59,6 +59,18 @@
 			"style": {
 				"navigationBarTitleText": "upload-image"
 			}
+		},
+		{
+			"path": "pages/upload-video/index",
+			"style": {
+				"navigationBarTitleText": "upload-video"
+			}
+		},
+		{
+			"path": "pages/priview-video/index",
+			"style": {
+				"navigationBarTitleText": "priview-video"
+			}
 		}
 	],
 	"globalStyle": {

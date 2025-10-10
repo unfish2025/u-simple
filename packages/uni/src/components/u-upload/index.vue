@@ -11,7 +11,7 @@
 		</slot>
 		<slot name="list" :list="value">
 			<view class="u-upload-list-container u-border-box">
-				<view class="u-upload-list-item u-border-box" v-for="(it, i) in value" :key="it.uuid">
+				<view class="u-upload-list-item u-border-box" v-for="(it, i) in value" :key="it.uuid" @click="priview(it, i)">
 					<slot name="item" :item="it" :index="i">
 						<view class="u-upload-item-content">{{ it.filename }}</view>
 					</slot>
@@ -20,7 +20,7 @@
 							v-if="!isDisabled || isDisabledShowRemoveIcon"
 							class="u-iconfont icon-delete u-upload-remove-icon"
 							:class="{ 'u-upload-is-disabled': isDisabled, 'u-upload-is-active': !isDisabled }"
-							@click="removeFile(it, i)"
+							@click.stop.prevent="removeFile(it, i)"
 						></view>
 					</slot>
 				</view>
@@ -99,8 +99,8 @@ export default {
 			default: false
 		},
 
-		/** 选择文件钩子函数, 返回值将作为选择的结果 */
-		choose: {
+		/** 文件过滤钩子函数, 返回值将作为选择的结果 */
+		filter: {
 			type: Function
 		},
 
@@ -161,6 +161,10 @@ export default {
 	},
 
 	methods: {
+		priview(it, i) {
+			this.$emit('priview', it, i)
+		},
+
 		// #ifdef WEB
 		async onWebFileChange(fileList) {
 			let files = await Promise.all(
@@ -172,10 +176,10 @@ export default {
 					}
 				})
 			)
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}
@@ -219,10 +223,10 @@ export default {
 					}
 				})
 			)
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}

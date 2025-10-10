@@ -3,15 +3,20 @@
 		class="u-popup"
 		:visible="isShow"
 		:isClickClose="false"
-		:zIndex="maskZIndex"
-		:bgColor="maskBgColor"
-		:isAnimation="maskIsAnimation"
-		:duration="maskDuration"
-		:timingFunction="maskTimingFunction"
-		:delay="maskDelay"
-		:isLockScroll="maskIsLockScroll"
-		:isLockBody="maskIsLockBody"
+		:zIndex="maskConfig.zIndex"
+		:bgColor="maskConfig.bgColor"
+		:isAnimation="maskConfig.isAnimation"
+		:duration="maskConfig.duration"
+		:timingFunction="maskConfig.timingFunction"
+		:delay="maskConfig.delay"
+		:isLockScroll="maskConfig.isLockScroll"
+		:isLockBody="maskConfig.isLockBody"
 		@click="onClick"
+		@open="$emit('maskOpen', $event)"
+		@opened="$emit('maskOpened', $event)"
+		@close="$emit('maskClose', $event)"
+		@closed="$emit('maskClosed', $event)"
+		@maskAnimationend="$emit('maskAnimationend', $event)"
 	>
 		<view class="u-popup-content" :style="style" :class="renderClassName" @animationend="onAnimationend"><slot></slot></view>
 	</u-mask>
@@ -78,53 +83,11 @@ export default {
 		},
 
 		// 以下兼容小程序, 无法使用 v-bind
-
-		/** mask 层级 */
-		maskZIndex: {
-			type: [String, Number],
-			default: 1000
-		},
-
-		/** mask 背景颜色 */
-		maskBgColor: {
-			type: String,
-			default: 'rgba(0, 0, 0, 0.45)'
-		},
-
-		/** mask 是否开启动画 */
-		maskIsAnimation: {
-			type: Boolean,
-			default: true
-		},
-
-		/** mask 动画时长，单位ms */
-		maskDuration: {
-			type: [String, Number],
-			default: 200
-		},
-
-		/** mask 动画函数 */
-		maskTimingFunction: {
-			type: String,
-			default: 'ease'
-		},
-
-		/** mask 动画延迟，单位ms */
-		maskDelay: {
-			type: [String, Number],
-			default: 0
-		},
-
-		/** mask 是否锁定背景滚动 */
-		maskIsLockScroll: {
-			type: Boolean,
-			default: true
-		},
-
-		/** mask 是否锁定页面滚动，仅在 web 有效，锁定后会修改 body 的 overflow 属性 */
-		maskIsLockBody: {
-			type: Boolean,
-			default: true
+		maskProps: {
+			type: Object,
+			default() {
+				return {}
+			}
 		}
 	},
 
@@ -137,6 +100,28 @@ export default {
 	},
 
 	computed: {
+		maskConfig() {
+			return {
+				/** mask 层级 */
+				zIndex: 1000,
+				/** mask 背景颜色 */
+				bgColor: 'rgba(0, 0, 0, 0.45)',
+				/** mask 是否开启动画 */
+				isAnimation: true,
+				/** mask 动画时长，单位ms */
+				duration: 200,
+				/** mask 动画函数 */
+				timingFunction: 'ease',
+				/** mask 动画延迟，单位ms */
+				delay: 0,
+				/** mask 是否锁定背景滚动 */
+				isLockScroll: true,
+				/** mask 是否锁定页面滚动，仅在 web 有效，锁定后会修改 body 的 overflow 属性 */
+				isLockBody: false,
+				...this.maskProps
+			}
+		},
+
 		style() {
 			// 兼容 uniapp bug 解析为字符串, 以适配小程序
 			return css.styleObjectToString({

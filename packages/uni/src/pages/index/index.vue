@@ -9,6 +9,8 @@
 		<u-button @click="toCarousel" :is-border-radius="false">轮播组件</u-button>
 		<u-button @click="toUpload" :is-border-radius="false">文件上传组件</u-button>
 		<u-button @click="toUploadImage" :is-border-radius="false">图片上传组件</u-button>
+		<u-button @click="toUploadVideo" :is-border-radius="false">视频上传组件</u-button>
+		<u-button @click="toPriviewVideo" :is-border-radius="false">视频预览组件</u-button>
 	</view>
 </template>
 
@@ -73,6 +75,18 @@ export default Vue.extend({
 		toUploadImage() {
 			uni.navigateTo({
 				url: '/pages/upload-image/index'
+			})
+		},
+
+		toUploadVideo() {
+			uni.navigateTo({
+				url: '/pages/upload-video/index'
+			})
+		},
+
+		toPriviewVideo() {
+			uni.navigateTo({
+				url: '/pages/priview-video/index'
 			})
 		}
 	}

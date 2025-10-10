@@ -2,14 +2,67 @@
 	<view ref="uUpload" class="u-base u-border-box u-upload-video">
 		<view class="u-upload-video-list-item u-border-box" v-for="(it, i) in value" :key="it.uuid" @click="priview(it, i)">
 			<slot name="item" :item="it" :index="i">
-				<video :src="it.url" class="u-upload-video-item-content-video" @error="$emit('error', $event)" @load="$emit('load', $event)"></video>
+				<video
+					:src="it.url"
+					class="u-upload-video-item-content-video"
+					:autoplay="videoConfig.autoplay"
+					:loop="videoConfig.loop"
+					:muted="videoConfig.muted"
+					:initial-time="videoConfig.initialTime"
+					:duration="videoConfig.duration"
+					:controls="videoConfig.controls"
+					:danmu-list="videoConfig.danmuList"
+					:danmu-btn="videoConfig.danmuBtn"
+					:enable-danmu="videoConfig.enableDanmu"
+					:page-gesture="videoConfig.pageGesture"
+					:direction="videoConfig.direction"
+					:show-progress="videoConfig.showProgress"
+					:show-fullscreen-btn="videoConfig.showFullscreenBtn"
+					:show-play-btn="videoConfig.showPlayBtn"
+					:show-center-play-btn="videoConfig.showCenterPlayBtn"
+					:show-loading="videoConfig.showLoading"
+					:enable-progress-gesture="videoConfig.enableProgressGesture"
+					:object-fit="videoConfig.objectFit"
+					:poster="videoConfig.poster"
+					:show-mute-btn="videoConfig.showMuteBtn"
+					:title="videoConfig.title"
+					:play-btn-position="videoConfig.playBtnPosition"
+					:mobilenet-hint-type="videoConfig.mobilenetHintType"
+					:enable-play-gesture="videoConfig.enablePlayGesture"
+					:auto-pause-if-navigate="videoConfig.autoPauseIfNavigate"
+					:auto-pause-if-open-native="videoConfig.autoPauseIfOpenNative"
+					:vslide-gesture="videoConfig.vslideGesture"
+					:vslide-gesture-in-fullscreen="videoConfig.vslideGestureInFullscreen"
+					:ad-unit-id="videoConfig.adUnitId"
+					:poster-for-crawler="videoConfig.posterForCrawler"
+					:codec="videoConfig.codec"
+					:http-cache="videoConfig.httpCache"
+					:play-strategy="videoConfig.playStrategy"
+					:header="videoConfig.header"
+					:is-live="videoConfig.isLive"
+					@play="$emit('play', $event, it, i)"
+					@pause="$emit('pause', $event, it, i)"
+					@ended="$emit('ended', $event, it, i)"
+					@timeupdate="$emit('timeupdate', $event, it, i)"
+					@fullscreenchange="$emit('fullscreenchange', $event, it, i)"
+					@waiting="$emit('waiting', $event, it, i)"
+					@error="$emit('error', $event, it, i)"
+					@progress="$emit('progress', $event, it, i)"
+					@loadeddata="$emit('loadeddata', $event, it, i)"
+					@loadstart="$emit('loadstart', $event, it, i)"
+					@seeked="$emit('seeked', $event, it, i)"
+					@seeking="$emit('seeking', $event, it, i)"
+					@loadedmetadata="$emit('loadedmetadata', $event, it, i)"
+					@fullscreenclick="$emit('fullscreenclick', $event, it, i)"
+					@controlstoggle="$emit('controlstoggle', $event, it, i)"
+				></video>
 			</slot>
 			<slot name="remove" :item="it" :index="i">
 				<view
 					v-if="!isDisabled || isDisabledShowRemoveIcon"
 					class="u-iconfont icon-close u-upload-video-remove-icon"
 					:class="{ 'u-upload-video-is-disabled': isDisabled, 'u-upload-video-is-active': !isDisabled }"
-					@click="removeFile(it, i)"
+					@click.stop.prevent="removeFile(it, i)"
 				></view>
 			</slot>
 		</view>
@@ -22,10 +75,13 @@
 				<view class="u-iconfont icon-album"></view>
 			</view>
 		</slot>
+
+		<u-priview-video :visible.sync="visible" v-model="index" :urls="urls"></u-priview-video>
 	</view>
 </template>
 
 <script>
+import UPriviewVideo from '@/components/u-priview-video/index.vue'
 import { createUUID, Path, WebChooseFile } from '@/utils'
 const path = new Path()
 // #ifdef WEB
@@ -38,6 +94,8 @@ export default {
 		event: 'input'
 	},
 
+	components: { UPriviewVideo },
+
 	props: {
 		/** 上传文件列表, 每一项是一个对象, 应包含 uuid, file, ext, filename, arrayBuffer 等字段 */
 		value: {
@@ -47,13 +105,13 @@ export default {
 			}
 		},
 
-		/** 是否开启图片预览, 默认为 true */
+		/** 是否开启视频预览, 默认为 true */
 		isPriview: {
 			type: Boolean,
 			default: true
 		},
 
-		/** 图片预览配置项, 具体参考 uniapp uni.previewImage 接口 */
+		/** 视频预览配置项 */
 		priviewProps: {
 			type: Object,
 			default() {
@@ -103,7 +161,7 @@ export default {
 			default: 1
 		},
 
-		/** album 从相册选图，camera 使用相机，默认二者都有。如需直接开相机或直接选相册，请只使用一个选项, 使用该配置后将自动转换为 webChooseFileProps 支持的 capture */
+		/** album 从相册选择，camera 使用相机，默认二者都有。如需直接开相机或直接选相册，请只使用一个选项, 使用该配置后将自动转换为 webChooseFileProps 支持的 capture */
 		sourceType: {
 			type: Array,
 			default() {
@@ -123,8 +181,8 @@ export default {
 			default: false
 		},
 
-		/** 选择文件钩子函数, 返回值将作为选择的结果 */
-		choose: {
+		/** 文件过滤钩子函数, 返回值将作为选择的结果 */
+		filter: {
 			type: Function
 		},
 
@@ -148,11 +206,21 @@ export default {
 		isDisabledShowRemoveIcon: {
 			type: Boolean,
 			default: false
+		},
+
+		/** 视频配置项 */
+		videoProps: {
+			type: Object,
+			default() {
+				return {}
+			}
 		}
 	},
 
 	data() {
 		return {
+			index: 0,
+			visible: false,
 			// #ifdef WEB
 			tempUrlList: []
 			// #endif
@@ -160,6 +228,44 @@ export default {
 	},
 
 	computed: {
+		videoConfig() {
+			const config = {
+				autoplay: false,
+				muted: false,
+				controls: false,
+				danmuList: [],
+				danmuBtn: false,
+				enableDanmu: false,
+				pageGesture: false,
+				showProgress: true,
+				showFullscreenBtn: true,
+				showPlayBtn: true,
+				showCenterPlayBtn: false,
+				showLoading: true,
+				enableProgressGesture: true,
+				objectFit: 'contain',
+				showMuteBtn: false,
+				playBtnPosition: 'bottom',
+				mobilenetHintType: 1,
+				enablePlayGesture: false,
+				autoPauseIfNavigate: true,
+				autoPauseIfOpenNative: true,
+				vslideGesture: false,
+				vslideGestureInFullscreen: true,
+				codec: 'hardware',
+				httpCache: true,
+				playStrategy: 0,
+				header: {},
+				isLive: false,
+				...this.videoProps
+			}
+			return config
+		},
+
+		urls() {
+			return this.value.map((it) => it.url)
+		},
+
 		/** 剩余可选择数 */
 		surplus() {
 			let surplus = 0
@@ -194,14 +300,13 @@ export default {
 
 	methods: {
 		priview(it, i) {
+			this.$emit('priview', it, i)
 			if (!this.isPriview) {
 				return
 			}
 
-			uni.previewImage({
-				urls: this.value.map((item) => item.url),
-				current: it.url
-			})
+			this.index = i
+			this.visible = true
 		},
 
 		// #ifdef WEB
@@ -211,16 +316,16 @@ export default {
 					return {
 						...fileInfo,
 						uuid: createUUID(),
-						url: fileInfo.file.path ? fileInfo.file.path : URL.createObjectURL(new Blob([fileInfo.file], { type: fileInfo.file.type })),
+						url: fileInfo.url ? fileInfo.url : URL.createObjectURL(fileInfo.file),
 						arrayBuffer: this.immediateGetArrayBuffer ? await fileInfo.file.arrayBuffer() : null
 					}
 				})
 			)
 			files.forEach((it) => this.tempUrlList.push(it.url))
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}
@@ -250,7 +355,13 @@ export default {
 		},
 
 		async onWxFileChange(res) {
-			const originFiles = res.tempFiles
+			const originFiles = res.tempFiles || [
+				{
+					name: res.tempFilePath,
+					path: res.tempFilePath,
+					size: res.size
+				}
+			]
 			let files = await Promise.all(
 				originFiles.slice(0, this.surplus).map(async (file) => {
 					const { ext, filename } = path.getNameInfo(file.name ?? file.path ?? '')
@@ -261,15 +372,18 @@ export default {
 						filename,
 						url: file.path,
 						size: file.size,
-						type: file.type ?? this.wxMessageChooseFileProps.type ?? 'image',
+						type: file.type ?? this.wxMessageChooseFileProps.type ?? 'video',
+						duration: res.duration,
+						width: res.width,
+						height: res.height,
 						arrayBuffer: this.immediateGetArrayBuffer ? await this.wxReadFileAsArrayBuffer(file.path) : null
 					}
 				})
 			)
-			if (this.choose) {
-				const result = await this.choose(files)
+			if (this.filter) {
+				const result = await this.filter(files)
 				if (!Array.isArray(result)) {
-					throw new Error('choose 方法必须返回一个数组')
+					throw new Error('filter 方法必须返回一个数组')
 				}
 				files = result
 			}
@@ -305,21 +419,30 @@ export default {
 					capture,
 					...this.webChooseFileProps,
 					count: this.surplus,
-					accept: 'image/*',
+					accept: 'video/*',
 					packFile: true
 				})
 				this.onWebFileChange(files)
 			} else {
-				uni.chooseImage({
+				// 仅支持单视频上传
+				uni.chooseVideo({
 					sourceType: this.sourceType,
 					...this.uniChooseFileProps,
-					count: this.surplus,
 					success: (res) => {
 						if (this.uniChooseFileProps.success) {
 							this.uniChooseFileProps.success(res)
 						}
 
-						this.onWebFileChange(res.tempFiles.slice(0, this.surplus).map((it) => webChooseFile.packFile(it)))
+						this.onWebFileChange([
+							{
+								...webChooseFile.packFile(res.tempFile),
+								url: res.tempFilePath,
+								duration: res.duration,
+								size: res.size,
+								width: res.width,
+								height: res.height
+							}
+						])
 					}
 				})
 			}
@@ -327,7 +450,7 @@ export default {
 			// #ifdef MP-WEIXIN
 			if (this.isUseWxChooseMessageFile) {
 				wx.chooseMessageFile({
-					type: 'image',
+					type: 'video',
 					...this.wxMessageChooseFileProps,
 					count: this.surplus,
 					success: (res) => {
@@ -338,10 +461,10 @@ export default {
 					}
 				})
 			} else {
-				uni.chooseImage({
+				// 仅支持单视频上传
+				uni.chooseVideo({
 					sourceType: this.sourceType,
 					...this.uniChooseFileProps,
-					count: this.surplus,
 					success: (res) => {
 						if (this.uniChooseFileProps.success) {
 							this.uniChooseFileProps.success(res)
@@ -453,7 +576,7 @@ export default {
 	overflow: hidden;
 }
 
-.u-upload-video-item-content-image {
+.u-upload-video-item-content-video {
 	width: 100%;
 	height: 100%;
 	display: block;
@@ -463,6 +586,7 @@ export default {
 	position: absolute;
 	top: 0;
 	right: 0;
+	z-index: 1;
 	display: flex;
 	justify-content: center;
 	align-items: center;

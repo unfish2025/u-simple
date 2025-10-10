@@ -310,6 +310,10 @@ export default {
 
 <style scoped lang="scss">
 .u-carousel {
+	--u-carousel-width: 100%;
+	--u-carousel-height: auto;
+	width: var(--u-carousel-width);
+	height: var(--u-carousel-height);
 	overflow: hidden;
 	position: relative;
 }
@@ -317,5 +321,6 @@ export default {
 .u-carousel-container {
 	display: flex;
 	width: 100%;
+	height: var(--u-carousel-height);
 }
 </style>
